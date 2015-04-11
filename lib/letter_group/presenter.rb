@@ -12,9 +12,9 @@ module LetterGroup
     DEFAULT_SELECTED = ("a".."c").to_a.freeze
     IN_GROUPS = ALPHABET_AND_OTHER.each_slice(3)
 
-    attr_reader :array_of_hashes, :groups, :total_selected, :selected
+    attr_reader :array_of_hashes, :groups, :total_selected, :selected, :labels
 
-    def initialize(array_of_hashes = [], alpha_key:, unique_key:, selected: nil, field_groups: {})
+    def initialize(array_of_hashes = [], alpha_key:, unique_key:, selected: nil, field_groups: {}, labels: true)
       # With this sort of data triage many of the result rows must be combined to represent a single data issue.
       #   (the nature of SQL JOINS)
       # Thus we can only get a count by tallying up the total for each group.
@@ -27,6 +27,7 @@ module LetterGroup
       raise ArgumentError, "#{self.class} Looks like unique_key (#{@unique_key} was not part of the select on fields: #{@fields.inspect}" unless @fields.empty? || @fields.include?(@unique_key)
       @field_groups = field_groups || {}
       @groups = {}
+      @labels = labels
       divide_into_letters
       set_selected(selected)
       @total_selected = each.inject(0) {|memo, group| memo += group.total; memo }
@@ -67,7 +68,8 @@ module LetterGroup
             letter: letter,
             unique_key: @unique_key,
             fields: @fields,
-            field_groups: @field_groups
+            field_groups: @field_groups,
+            labels: labels
         )
       end
       rows, @array_of_hashes = @array_of_hashes.partition do |_|

@@ -29,17 +29,19 @@
 #                               "name" => ["leads_first_name", "ol_first_name"]
 #                               }
 #                         default {}
+#   param labels - optional, false for no labels, true to use column names from first field group, or an array to provide custom labels.
 
 module LetterGroup
   class Group
 
     attr_reader :rows, :letter, :total, :unique_key, :fields, :field_groups, :labels
 
-    def initialize(array_of_hashes = [], letter: "", unique_key: nil, fields: [], field_groups: {})
+    def initialize(array_of_hashes = [], letter: "", unique_key: nil, fields: [], field_groups: {}, labels: true)
       @array_of_hashes = array_of_hashes || []
       @letter = (letter || "").upcase
       # when unique_key is nil results in a single Tuple with a set for all the rows in this group.
       @unique_key = unique_key
+      @labels = labels
       determine_fields(fields, field_groups)
       fill_rows
     end
@@ -70,14 +72,17 @@ module LetterGroup
         @field_groups = @fields.inject({}) {|memo, elem| memo[elem] = Array(elem); memo}
       end
       @num_fields = @fields.length
-      # The column names in the first field_group will be used as labels in the view.
-      # so for { "ID" => ["lead_id", "user_id"] }
-      # the labels are the array ["lead_id","user_id"]
-      @labels = if @field_groups.first
-                  @field_groups.first[1]
-                else
-                  []
-                end
+      # If @labels are desired, but haven't been provided by caller, set a default.
+      if @labels && !@labels.is_a?(Array)
+        # The column names in the first field_group will be used as labels in the view.
+        # so for { "ID" => ["lead_id", "user_id"] }
+        # the labels are the array ["lead_id","user_id"]
+        @labels = if @field_groups.first
+                    @field_groups.first[1]
+                  else
+                    []
+                  end
+      end
     end
 
     def fill_rows
