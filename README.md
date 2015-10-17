@@ -24,22 +24,20 @@ Or install it yourself as:
 
 ## Usage
 
-Here's a silly example.  You did a raw SQL query and don't know how to see the result:
+Here's a silly example.  You did a raw SQL query and don't know how to see the result, and somehow Google isn't working right now (!):
 
 ```
-LetterGroup::Group.new(ActiveRecord::Base.connection.execute("select localtimestamp at time zone 'UTC'"))
+[1] pry(main)> ActiveRecord::Base.connection.execute("select localtimestamp at time zone 'UTC'")
+   (1.9ms)  select localtimestamp at time zone 'UTC'
+=> #<PG::Result:0x007fbde1b9b170 @connection=#<PG::Connection:0x007fbdfa9aee70 @notice_processor=nil, @notice_receiver=nil, @socket_io=nil>>
+```
+
+Oh Noes!  `LetterGroup::Group` is a can opener.  Use it.
+
+```
+[9] pry(main)> LetterGroup::Group.new(ActiveRecord::Base.connection.execute("select localtimestamp at time zone 'UTC'")).rows
    (0.5ms)  select localtimestamp at time zone 'UTC'
-=> #<LetterGroup::Group:0x007fbde1a4b1d0
- @array_of_hashes=#<PG::Result:0x007fbde1a4b748 @connection=#<PG::Connection:0x007fbdfa9aee70 @notice_processor=nil, @notice_receiver=nil, @socket_io=nil>>,
- @field_groups={},
- @fields=[],
- @labels=[],
- @letter="",
- @num_fields=0,
- @rows={nil=>[{"timezone"=>"2015-10-17 20:03:20.168551+00"}]}, ## <=== There is the result!!
- @total=1,
- @unique_key=nil,
- @unique_values=[nil]>
+=> {nil=>[{"timezone"=>"2015-10-17 20:06:39.212512+00"}]}
  ```
 
 See specs for more real world usage examples.
