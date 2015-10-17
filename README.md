@@ -1,6 +1,6 @@
 # LetterGroup
 
-Organize data results from raw sql queries (as with PGresult, or Dossier) intelligently.
+Organize data results from raw sql queries (as with PGresult, or Dossier) intelligently.  Or even simple arrays of hashes.
 
 See specs for examples.
 
